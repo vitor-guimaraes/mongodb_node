@@ -12,16 +12,43 @@ async function main () {
 
     try {
         await client.connect();
-        console.log('connected o mongodb')
+        console.log('connected to mongodb')
 
         //await listDatabases(client); 
 
-        await createListing(client, { 
-            name: "Lovely Loft",
-            summary: "Loft in Paris",
-            bedrooms: 1,
-            bathrooms: 1
-        })
+        // await createListing(client, { 
+        //     name: 'Lovely Loft',
+        //     summary: 'Loft in Paris',
+        //     bedrooms: 1,
+        //     bathrooms: 1
+        // })
+
+        await createMultipleListings(client, [
+        {
+            name: 'Loft 2',
+            summary: 'Loft in Amsterdam',
+            property_type: 'House',
+            bedrooms: 3,
+            bathrooms: 2,
+            beds: 3
+        }, 
+        {
+            name: 'Loft 3',
+            summary: 'Loft in Zurich',
+            property_type: 'Apartment',
+            bedrooms: 6,
+            bathrooms: 3
+        }, 
+        {
+            name: 'Loft 4',
+            summary: 'Loft in Edinburgh',
+            property_type: 'Apartment',
+            bedrooms: 3,
+            bathrooms: 5,
+            beds: 3,
+            last_review: new Date()
+        }
+    ]);
 
     } catch (err) {
         console.error(err);
@@ -45,4 +72,11 @@ async function createListing(client, newListing) {
     const result = await client.db('sample_airbnb').collection('listingsAndReviews').insertOne(newListing);
 
     console.log(`New listing created with id: ${result.insertedId}`);
+}
+
+async function createMultipleListings(client, newListings) {
+    const result = await client.db('sample_airbnb').collection('listingsAndReviews').insertMany(newListings);
+
+    console.log(`${result.insertedCount} new listings with ids:`);
+    console.log(`${result.insertedIds}`);
 }
