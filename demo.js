@@ -23,32 +23,34 @@ async function main () {
         //     bathrooms: 1
         // })
 
-        await createMultipleListings(client, [
-        {
-            name: 'Loft 2',
-            summary: 'Loft in Amsterdam',
-            property_type: 'House',
-            bedrooms: 3,
-            bathrooms: 2,
-            beds: 3
-        }, 
-        {
-            name: 'Loft 3',
-            summary: 'Loft in Zurich',
-            property_type: 'Apartment',
-            bedrooms: 6,
-            bathrooms: 3
-        }, 
-        {
-            name: 'Loft 4',
-            summary: 'Loft in Edinburgh',
-            property_type: 'Apartment',
-            bedrooms: 3,
-            bathrooms: 5,
-            beds: 3,
-            last_review: new Date()
-        }
-    ]);
+    //     await createMultipleListings(client, [
+    //     {
+    //         name: 'Loft 2',
+    //         summary: 'Loft in Amsterdam',
+    //         property_type: 'House',
+    //         bedrooms: 3,
+    //         bathrooms: 2,
+    //         beds: 3
+    //     }, 
+    //     {
+    //         name: 'Loft 3',
+    //         summary: 'Loft in Zurich',
+    //         property_type: 'Apartment',
+    //         bedrooms: 6,
+    //         bathrooms: 3
+    //     }, 
+    //     {
+    //         name: 'Loft 4',
+    //         summary: 'Loft in Edinburgh',
+    //         property_type: 'Apartment',
+    //         bedrooms: 3,
+    //         bathrooms: 5,
+    //         beds: 3,
+    //         last_review: new Date()
+    //     }
+    // ]);
+
+    await findOneListingByName(client, 'Loft 3');
 
     } catch (err) {
         console.error(err);
@@ -78,5 +80,16 @@ async function createMultipleListings(client, newListings) {
     const result = await client.db('sample_airbnb').collection('listingsAndReviews').insertMany(newListings);
 
     console.log(`${result.insertedCount} new listings with ids:`);
-    console.log(`${result.insertedIds}`);
+    console.log(`${result.insertedIds}`); //NÃO IMPRIME AS IDS
+}
+
+async function findOneListingByName(client, nameOfListing) {
+    const result = await client.db('sample_airbnb').collection('listingsAndReviews').findOne({ name: nameOfListing });
+
+    if (result) {
+        console.log(`Found listing in the collectionwith the name '${nameOfListing}'`);
+        console.log(result);
+    } else {
+        console.log(`No listings found with the name '${nameOfListing}'`);
+    }
 }
