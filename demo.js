@@ -14,6 +14,9 @@ async function main () {
     try {
         await client.connect();
         console.log('connected o mongodb')
+
+        await listDatabases(client);
+
     } catch (err) {
         console.error(err);
     } finally {
@@ -22,3 +25,12 @@ async function main () {
 }
 
 main().catch(console.error);
+
+async function listDatabases(client) {
+    const databasesList = await client.db().admin().listDatabases();
+
+    console.log('Databases:');
+    databasesList.databases.forEach(db => {
+        console.log(`- ${db.name}`);
+    });
+}
