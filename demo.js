@@ -14,7 +14,7 @@ async function main () {
         await client.connect();
         console.log('connected to mongodb')
 
-        //await listDatabases(client); 
+        // await listDatabases(client); 
 
         // await createListing(client, { 
         //     name: 'Lovely Loft',
@@ -25,7 +25,7 @@ async function main () {
 
     //     await createMultipleListings(client, [
     //     {
-    //         name: 'Loft 2',
+    //         name: 'Amsterdam Loft',
     //         summary: 'Loft in Amsterdam',
     //         property_type: 'House',
     //         bedrooms: 3,
@@ -33,14 +33,14 @@ async function main () {
     //         beds: 3
     //     }, 
     //     {
-    //         name: 'Loft 3',
+    //         name: 'Zurich Loft',
     //         summary: 'Loft in Zurich',
     //         property_type: 'Apartment',
     //         bedrooms: 6,
     //         bathrooms: 3
     //     }, 
     //     {
-    //         name: 'Loft 4',
+    //         name: 'Edinburgh Loft',
     //         summary: 'Loft in Edinburgh',
     //         property_type: 'Apartment',
     //         bedrooms: 3,
@@ -50,7 +50,9 @@ async function main () {
     //     }
     // ]);
 
-    await findOneListingByName(client, 'Loft 3');
+    // await findOneListingByName(client, 'Edinburgh Loft');
+
+    await updateListingByName(client, 'Amsterdam Loft', {beds: 2, bedrooms: 2}); //NÃO FAZ A MERDA DO UPDATE, PORQUE?????
 
     } catch (err) {
         console.error(err);
@@ -92,4 +94,13 @@ async function findOneListingByName(client, nameOfListing) {
     } else {
         console.log(`No listings found with the name '${nameOfListing}'`);
     }
+}
+
+async function updateListingByName(client, nameOfListing, updatedListing) {
+    const result = await client.db('sample_airbnb').collection('listingAndReviews').updateOne( { name: nameOfListing }, 
+        { $set:updatedListing });
+
+        console.log(`${result.matchedCount} documents matched the criteria`);
+        console.log(`${result.modifiedCount} documents were updated`);
+
 }
