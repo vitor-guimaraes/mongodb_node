@@ -54,7 +54,9 @@ async function main () {
 
     // await updateListingByName(client, 'Edinburgh Loft', { beds: 3, bedrooms: 3 });
 
-    await upsertListingByName(client, 'Quebrada', { name: 'Quebrada na Quebrada', bedrooms: 2, bathrooms: 1 }); //INSERE, MAS NÃO ATUALIZA
+    // await upsertListingByName(client, 'Quebrada', { name: 'Quebrada na Quebrada', bedrooms: 2, bathrooms: 1 }); //INSERE, MAS NÃO ATUALIZA
+
+    await deleteListingByName(client, 'Quebrada na Quebrada');
 
     } catch (err) {
         console.error(err);
@@ -104,7 +106,7 @@ async function updateListingByName(client, nameOfListing, updatedListing) {
 
         console.log(`${result.matchedCount} documents matched the criteria`);
         console.log(`${result.modifiedCount} documents were updated`);
-        //NÃO ACHA AS LISTAGENS
+        
 }
 
 async function upsertListingByName(client, nameOfListing, updatedListing) {
@@ -117,4 +119,11 @@ async function upsertListingByName(client, nameOfListing, updatedListing) {
         } else {
             console.log(`${result.modifiedCount} documents were updated`);
         }
+        //INSERE MAS NÃO ATUALIZA
+    }
+
+    async function deleteListingByName(client, nameOfListing) {
+        const result = await client.db('sample_airbnb').collection('listingsAndReviews').deleteOne( { name: nameOfListing })
+        
+        console.log(`${result.deletedCount} documents deleted`);
     }
