@@ -52,7 +52,9 @@ async function main () {
 
     // await findOneListingByName(client, 'Edinburgh Loft');
 
-    await updateListingByName(client, 'Amsterdam Loft', {beds: 2, bedrooms: 2}); //NÃO FAZ A MERDA DO UPDATE, PORQUE?????
+    // await updateListingByName(client, 'Edinburgh Loft', { beds: 3, bedrooms: 3 });
+
+    await upsertListingByName(client, 'Quebrada', { name: 'Quebrada na Quebrada', bedrooms: 2, bathrooms: 1 }); //INSERE, MAS NÃO ATUALIZA
 
     } catch (err) {
         console.error(err);
@@ -97,10 +99,22 @@ async function findOneListingByName(client, nameOfListing) {
 }
 
 async function updateListingByName(client, nameOfListing, updatedListing) {
-    const result = await client.db('sample_airbnb').collection('listingAndReviews').updateOne( { name: nameOfListing }, 
+    const result = await client.db('sample_airbnb').collection('listingsAndReviews').updateOne( { name: nameOfListing }, 
         { $set:updatedListing });
 
         console.log(`${result.matchedCount} documents matched the criteria`);
         console.log(`${result.modifiedCount} documents were updated`);
-
+        //NÃO ACHA AS LISTAGENS
 }
+
+async function upsertListingByName(client, nameOfListing, updatedListing) {
+    const result = await client.db('sample_airbnb').collection('listingsAndReviews').updateOne( { name: nameOfListing }, 
+        { $set:updatedListing }, { upsert: true });
+
+        console.log(`${result.matchedCount} documents matched the criteria`);
+        if (result.upsertedCount > 0) {
+            console.log(`Document with id ${result.upsertedId} inserted`);
+        } else {
+            console.log(`${result.modifiedCount} documents were updated`);
+        }
+    }
