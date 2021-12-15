@@ -28,7 +28,7 @@ async function main() {
         console.log('connected to mongodb!');
 
         // Make the appropriate DB calls
-    await printCheapestSuburbs(client, 'Australia', 'Sidney', 10);
+    await printCheapestSuburbs(client, 'Australia', 'Sydney', 10);
 
 
     } finally {
@@ -49,8 +49,8 @@ async function printCheapestSuburbs(client, country, market, maxNumberToPrint) {
       {
         '$match': {
            'bedrooms': 1,
-           'address.country': 'Australia',
-           'address.market': 'Sydney',
+           'address.country': country,
+           'address.market': market,
            'address.suburb': {
              '$exists': 1,
              '$ne': ''
@@ -69,7 +69,7 @@ async function printCheapestSuburbs(client, country, market, maxNumberToPrint) {
           'averagePrice': 1
          }
       }, {
-        '$limit': 10
+        '$limit': maxNumberToPrint
       }
     ];
     
