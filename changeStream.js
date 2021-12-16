@@ -1,4 +1,5 @@
 const { MongoClient } = require('mongodb');
+const stream = require('stream');
 
 async function main() {
     /**
@@ -28,21 +29,26 @@ async function main() {
 
         // Make the appropriate DB calls
 
-        // const pipeline = [
-        //     {
-        //         '$match': {
-        //             'operationType': 'insert',
-        //             'fullDocument.address.country': 'Australia',
-        //             'fullDocument.address.market': 'Sydney'
-        //         },
-        //     }
-        // ];
+        const pipeline = [
+            {
+                '$match': {
+                    'operationType': 'insert',
+                    'fullDocument.address.country': 'Australia',
+                    'fullDocument.address.market': 'Sydney'
+                },
+            }
+        ];
 
         // await monitorListingsUsingEventEmitter(client, 30000, pipeline);
+        // await monitorListingsUsingHasNext(client, 30000, pipeline);
+
 
         // await monitorListingsUsingEventEmitter(client);
+        
+        // await monitorListingsUsingHasNext(client);
+        
+        await monitorListingsUsingStreamAPI(client);
 
-        await monitorListingsUsingHasNext(client);
 
     } finally {
         // Close the connection to the MongoDB cluster
@@ -57,6 +63,7 @@ main().catch(console.error);
 // Add functions that make DB calls here
 
 function closeChangeStream(timeInMs = 60000, changeStream) {
+
     return new Promise((resolve) => {
         setTimeout(() => {
             console.log("Closing the change stream");
@@ -67,6 +74,7 @@ function closeChangeStream(timeInMs = 60000, changeStream) {
 };
 
 async function monitorListingsUsingEventEmitter(client, timeInMs = 60000, pipeline = []){
+
     const collection = client.db("sample_airbnb").collection("listingsAndReviews");
     const changeStream = collection.watch(pipeline);
     
@@ -78,6 +86,7 @@ async function monitorListingsUsingEventEmitter(client, timeInMs = 60000, pipeli
 }
 
 async function monitorListingsUsingHasNext(client, timeInMs = 60000, pipeline = []) {
+
     const collection = client.db("sample_airbnb").collection("listingsAndReviews");
     const changeStream = collection.watch(pipeline);
     closeChangeStream(timeInMs, changeStream);
@@ -93,4 +102,23 @@ async function monitorListingsUsingHasNext(client, timeInMs = 60000, pipeline = 
            throw error;
        }
     }
+}
+
+async function monitorListingsUsingStreamAPI(client, timeInMs = 60000, pipeline = []) {
+
+    const collection = client.db("sample_airbnb").collection("listingsAndReviews");
+    
+    const changeStream = collection.watch(pipeline);
+
+    changeStream.stream().pipe(
+        new stream.Writable({
+            objectMode: true,
+            write: function (doc, _, cb) {
+                console.log(doc);
+                cb();
+            }
+         })
+  );
+
+  await closeChangeStream(timeInMs, changeStream);
 }
