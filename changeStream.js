@@ -27,6 +27,7 @@ async function main() {
 
 
         // Make the appropriate DB calls
+        await monitorListingsUsingEventEmitter(client);
 
     } finally {
         // Close the connection to the MongoDB cluster
@@ -39,3 +40,24 @@ async function main() {
 main().catch(console.error);
 
 // Add functions that make DB calls here
+
+function closeChangeStream(timeInMs = 60000, changeStream) {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            console.log("Closing the change stream");
+            changeStream.close();
+            resolve();
+        }, timeInMs)
+    })
+};
+
+async function monitorListingsUsingEventEmitter(client, timeInMs = 60000, pipeline = []){
+    const collection = client.db("sample_airbnb").collection("listingsAndReviews");
+    const changeStream = collection.watch(pipeline);
+    
+    changeStream.on('change', (next) => {
+        console.log(next);
+   });
+
+   await closeChangeStream(timeInMs, changeStream);
+}
